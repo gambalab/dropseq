@@ -1,0 +1,214 @@
+# dropseq_aln.lib
+
+STD_MSG="Useful function for Drop-seq data"
+
+
+fastq2sam()
+{
+	declare local mem=$1
+	declare local r1=$2
+	declare local r2=$3
+	declare local sampleID=$4
+	declare local outDir=$5
+	declare local outBAM="${outDir}/${sampleID}_unl_read_pairs.bam"
+
+	ionice -c 3 java -Xmx${mem} -jar ${picard_tool} FastqToSam F1=${read1} F2=${read2} SM=${sampleID} SO=queryname O=${outBAM} QUIET=true
+	
+	if [ ! -e ${outBAM} ]
+	then
+		echo "Failed fastq2sam function"
+		exit 1
+	fi
+}
+
+sam2fastq()
+{
+	declare local mem=$1
+	declare local inDir=$2
+	declare local sampleID=$3
+	declare local outFASTQ="${inDir}/${sampleID}_filtered_and_trimmed_R2.fastq.gz"
+
+	ionice -c 3 java -Xmx${xmx} -jar ${picard_tool} SamToFastq \
+									I="${inDir}/${sampleID}_unl_read_pairs_filtered_adapter_polyA_trimmed.bam" \
+									F="${inDir}/${sampleID}_filtered_and_trimmed_R2.fastq.gz" \
+									QUIET=true
+	
+	if [ ! -e ${outFASTQ} ]
+	then
+		echo "Failed sam2fastq function"
+		exit 1
+	fi
+}
+
+tagLowQualityReads()
+{
+	declare local codetype=$1
+	declare local range=$2
+	declare local qual=$3
+	declare local mem=$4
+	declare local inDir=$5
+	declare local statDir=$6
+	declare local sampleID=$7
+	declare local outBAM=/dev/null
+	declare local statFile=/dev/null
+
+	if [ "${codetype}" = 'bc' ]
+	then
+		echo "BC mode ..."
+    	outBAM="${inDir}/${sampleID}_unl_read_pairs_tagged_cells.bam"
+    	statFile="${statDir}/${sampleID}_unl_read_pairs_stats_BC.txt"
+    	discard='False'
+    	inBAM="${inDir}/${sampleID}_unl_read_pairs.bam"
+    	tgName='XC'
+	else
+		echo "UMI mode ..."
+    	outBAM="${inDir}/${sampleID}_unl_read_pairs_tagged_cells_umi.bam"
+    	statFile="${statDir}/${sampleID}_unl_read_pairs_stats_UMI.txt"
+    	discard='True'
+    	inBAM="${inDir}/${sampleID}_unl_read_pairs_tagged_cells.bam"
+    	tgName='XM'
+	fi
+
+
+	ionice -c 3 java -Xmx${mem} -jar ${dropseq_tool} TagBamWithReadSequenceExtended \
+									I=${inBAM} \
+									SUMMARY=${statFile} \
+									BASE_RANGE=${range} \
+									BASE_QUALITY=${qual} \
+									NUM_BASES_BELOW_QUALITY=1 \
+									BARCODED_READ=1 \
+									DISCARD_READ=${discard} \
+									TAG_NAME=${tgName} \
+									O=${outBAM} \
+									QUIET=true
+
+	if [ ! -e ${outBAM} ]
+	then
+		echo "Failed tagLowQualityReads function"
+		exit 1
+	fi
+}
+
+
+filterBAM()
+{
+	declare local mem=$1
+	declare local inDir=$2
+	declare local sampleID=$3
+	declare local outBAM="${inDir}/${sampleID}_unl_read_pairs_filtered.bam"
+
+	ionice -c 3 java -Xmx${mem} -jar ${dropseq_tool} FilterBam \
+										I="${inDir}/${sampleID}_unl_read_pairs_tagged_cells_umi.bam" \
+										TAG_REJECT=XQ \
+										O=${outBAM} \
+										QUIET=true
+
+	if [ ! -e ${outBAM} ]
+	then
+		echo "Failed filterBAM function"
+		exit 1
+	fi
+}
+
+trimReads()
+{
+	declare local codetype=$1
+	declare local mem=$2
+	declare local inDir=$3
+	declare local statDir=$4
+	declare local sampleID=$5
+	declare local outBAM=/dev/null
+
+
+	if [ "${codetype}" = 'adapter' ]
+	then
+		echo "Timming 5' adapter..."
+    	outBAM="${inDir}/${sampleID}_unl_read_pairs_filtered_adapter_trimmed.bam"
+    	ionice -c 3 java -Xmx${mem} -jar ${dropseq_tool} TrimStartingSequence \
+										I="${inDir}/${sampleID}_unl_read_pairs_filtered.bam" \
+										OUTPUT_SUMMARY="${statDir}/${sampleID}_adapter_trimming.txt" \
+										SEQUENCE="AAGCAGTGGTATCAACGCAGAGTGAATGGG" \
+										MISMATCHES=0 \
+										NUM_BASES=5 \
+										O=${outBAM} \
+										QUIET=true
+	fi
+
+
+	if [ "${codetype}" = 'polyA' ]
+	then
+		echo "Timming 3' polyA..."
+    	outBAM="${inDir}/${sampleID}_unl_read_pairs_filtered_adapter_polyA_trimmed.bam"
+    	ionice -c 3 java -Xmx${mem} -jar ${dropseq_tool} PolyATrimmer \
+										I="${inDir}/${sampleID}_unl_read_pairs_filtered_adapter_trimmed.bam" \
+										OUTPUT_SUMMARY="${statDir}/${sampleID}_polyA_trimming.txt" \
+										MISMATCHES=0 \
+										NUM_BASES=6 \
+										O=${outBAM} \
+										USE_NEW_TRIMMER=true \
+										QUIET=true
+	fi
+
+	
+	if [ ! -e ${outBAM} ]
+	then
+		echo "Failed trimAdapter function"
+		exit 1
+	fi
+}
+
+
+intersectFASTQ()
+{
+	# to avoid memory problem is better to split reads names in smaller chunks of nlines
+	declare local r1=$1
+	declare local nlines=$2
+	declare local mem=$3
+	declare local inDir=$4
+	declare local sampleID=$5
+	declare local currentDir=$( 'pwd' )
+	declare local outFASTQ="${inDir}/${sampleID}_R1.fastq.gz"
+	declare local tmpdir="${inDir}/tmp_split_fastq"
+
+	
+	if [ -e "${outFASTQ}" ]
+	then
+		ionice -c 3 rm ${outFASTQ}
+		ionice -c 3 rm -r ${tmpdir}
+	fi
+	mkdir -p ${tmpdir}
+
+	# exstract all reads names
+	cd ${tmpdir}
+	echo "Step 1: reads names exstraction ..."
+	ionice -c 3 zcat "${inDir}/${sampleID}_filtered_and_trimmed_R2.fastq.gz" | awk -F "\t" '{ printf("%s",$0); n++; if(n%4==0) { printf("\n");} else { printf("\t");} }' | awk -F "\t" '{print substr($1,2)}' | ionice -c 3 split -l ${nlines} -d - "reads_names_"
+
+	# get the names of splitted files
+	shopt -s nullglob
+	nm=(${tmpdir}/reads_names_*)
+	shopt -u nullglob
+
+	# Use BBmap tool to subset reads
+	echo "Step 2: Use BBmap for subsetting ..."
+	declare -i c=0
+	for i in ${nm[@]}
+	 do
+	 echo "Processing file ${i}"
+	 ionice -c 3 ${bbmap}filterbyname.sh -Xmx${xmx} app=t in=${r1} out=${outFASTQ} include=t prefix=f names=${i}
+	 c=$(expr $c+1)
+	done
+
+	cd ${currentDir}
+
+	if [ ! -e ${outFASTQ} ]
+	then
+		echo "Failed intersectFASTQ function"
+		exit 1
+	else
+		# sort by name as reads 2
+		echo "Step 3: Sort the generated fastq by names ..."
+		ionice -c 3 ${bbmap}sortbyname.sh -Xmx${xmx} in=${outFASTQ} out="${inDir}/${sampleID}_filtered_and_trimmed_R1.fastq.gz"
+		ionice -c 3 rm ${outFASTQ}
+		ionice -c 3 rm -r ${tmpdir}
+	fi	
+}
