@@ -12,7 +12,7 @@ xmx=48g
 read1="/mnt/SSD_WIN10/fastq/TS1_R1_001.fastq.gz"
 read2="/mnt/SSD_WIN10/fastq/TS1_R2_001.fastq.gz"
 outDir="/mnt/SSD500/"
-
+ncells=2000
 
 ####################
 # Tools            #
@@ -118,6 +118,7 @@ ionice -c 3 ${star} --soloType CB_UMI_Simple \
      --readFilesCommand zcat \
      --outFilterMultimapNmax 1 \
      --outFileNamePrefix ${outDir}/${sample}/aln/ \
+     --soloCellFilter CellRanger2.2 ${ncells} 0.99 10 \
      --outSAMtype BAM Unsorted;
 
 
