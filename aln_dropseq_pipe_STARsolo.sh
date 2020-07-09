@@ -33,7 +33,7 @@ outDir=$5
 . ${wd}/dropseq_aln_v2.lib
 
 # dropseq tool
-dropseq_tool="${wd}/Drop-seq_tools-2.3.0/jar/dropseq.jar"
+dropseq_tool="${wd}/aln_tools/Drop-seq_tools-2.3.0/jar/dropseq.jar"
 
 # Picard tools
 picard_tool="${wd}/aln_tools/picard/picard.jar"
