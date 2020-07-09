@@ -1,40 +1,51 @@
 #!/bin/sh
+## Set the working Directorty to be the current one, i.e. from where you are submitting the script
+#$ -cwd
+
+# qsub -l nodes=1:ppn=15 -l naccesspolicy=singleuser -q fourjobs -F "sample_name path/to/read1 path/to/read2 number_of_target_cells project_out_folder" /home/users/ngs/dropseq_pipe/drop_seq/aln_dropseq_pipe_STARsolo.sh
+#
+# Notes:
+# sample_name = name of the sample. It will be used to store results in $project_out_folder
+# number_of_target_cells = usually equal to 2000 in Gaetano's experiments
+
 
 ####################
 # Step 0: configs  #
 ####################
 
-#export PATH=/opt/software/java/jdk8/bin/:$PATH
-
-sample='TS1'
-cpus=6
+export PATH=/opt/software/java/jdk8/bin/:$PATH
+wd="/home/users/ngs/dropseq_pipe" # path where the script is
+cpus=15
 xmx=48g
-read1="/mnt/SSD_WIN10/fastq/TS1_R1_001.fastq.gz"
-read2="/mnt/SSD_WIN10/fastq/TS1_R2_001.fastq.gz"
-outDir="/mnt/SSD500/"
-ncells=2000
+
+sample=$1
+read1=$2
+read2=$3
+ncells=$4
+outDir=$5
+
 
 ####################
 # Tools            #
 ####################
 
 # Dropseq lib path
-. /home/gg/work/package/drop_seq/dropseq_aln_v2.lib
+. ${wd}/dropseq_aln_v2.lib
 
 # dropseq tool
-dropseq_tool="./Drop-seq_tools-2.3.0/jar/dropseq.jar"
+dropseq_tool="${wd}/Drop-seq_tools-2.3.0/jar/dropseq.jar"
 
 # Picard tools
-picard_tool="./aln_tools/picard/picard.jar"
+picard_tool="${wd}/aln_tools/picard/picard.jar"
 
 # bbduk
-bbmap="./aln_tools/bbmap_38.82/" # <-- Put / at the end
-bbmapReource="./aln_tools/bbmap_38.82/resources"
+bbmap="${wd}/aln_tools/bbmap_38.82/" # <-- Put / at the end
+bbmapReource="${wd}/aln_tools/bbmap_38.82/resources"
 
 # genome and STAR paths
-genomeAnn='/path/to/genome_STAR_idx_folder'
-gtfAnn='/path/to/gtf'
-star='./STAR-2.7.5a/STAR'
+genomeAnn='/home/users/ngs/references/dropseq/dropseq_genome_idx'
+gtfAnn='/home/users/ngs/references/dropseq/genome_annotations/gencode.v34.primary_assembly.annotation.gtf'
+star='/opt/software/ngs/bin/STAR275a'
 
 ############################
 # Step 0: paths and files  #
