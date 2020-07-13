@@ -47,6 +47,11 @@ genomeAnn='/home/users/ngs/references/dropseq/dropseq_genome_idx'
 gtfAnn='/home/users/ngs/references/dropseq/genome_annotations/gencode.v34.primary_assembly.annotation.gtf'
 star='/opt/software/ngs/bin/STAR275a'
 
+# Paths to run emptyDrop
+rscript_bin='/opt/software/R/stable/3.5.1/bin/Rscript'
+R_emptyDrop='/home/users/gambardella/work/exome_variants/annovarAnnotate.R'
+
+
 ############################
 # Step 0: paths and files  #
 ############################
@@ -133,3 +138,10 @@ ionice -c 3 ${star} --soloType CB_UMI_Simple \
      --outSAMtype BAM Unsorted;
 
 ionice -c 3 ${R1} ${R2}
+
+
+# Run emptyDrop with R 
+# ------------------------------
+echo "Filter out cell matrix with emptyDrop"
+${rscript_bin} --vanilla ${R_emptyDrop} "${outDir}/${sample}/aln/Solo.out/" ${wd} ${sample} ${cpus}
+

@@ -59,6 +59,6 @@ M = M[,Matrix::colSums(M)>=500]
 
 # Cut and Save results
 M = M[Matrix::rowSums(M)>0,]
-saveRDS(M,paste0(wd,"/RData/",sample,"Filtered.mtx.rds"))
+saveRDS(M,paste0(wd,"/RData/",sample,".Filtered.mtx.rds"))
 
         
