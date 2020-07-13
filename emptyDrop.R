@@ -46,7 +46,7 @@ e.keep <- DropletUtils::emptyDrops(M[keep, ], retain = Inf,BPPARAM = BiocParalle
 summary(e.keep$FDR < 0.01)
 
 is.cell <- e.keep$FDR <= 0.01
-plot(e.keep$Total, -e.keep$LogProb, col=ifelse(is.cell, "red", "black"),xlab="Total UMI count", ylab="-Log Probability")
+#plot(e.keep$Total, -e.keep$LogProb, col=ifelse(is.cell, "red", "black"),xlab="Total UMI count", ylab="-Log Probability")
 
 is.cell[is.na(is.cell)] = FALSE
 M = M[,is.cell]
