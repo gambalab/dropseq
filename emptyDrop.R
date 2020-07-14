@@ -52,10 +52,10 @@ is.cell[is.na(is.cell)] = FALSE
 M = M[,is.cell]
 
 # Remove putative doublets
-M = rmdublecells(M)
+#M = rmdublecells(M)
 
 # Remove low covarage cells
-M = M[,Matrix::colSums(M)>=500]
+#M = M[,Matrix::colSums(M)>=500]
 
 # Cut and Save results
 M = M[Matrix::rowSums(M)>0,]
