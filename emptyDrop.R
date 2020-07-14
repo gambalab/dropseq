@@ -23,10 +23,10 @@ rmdublecells = function(M) {cellSum <- Matrix::colSums(M);M[,cellSum < quantile(
 # Input Parametres
 # ----------------
 args <- commandArgs(trailingOnly = TRUE)
-wd = as.character(args[1])
-repoDir=as.character(args[2])
-sample=as.character(args[3])
-cpus=as.numeric(args[4])
+wd = as.character(args[1]) #starSolo out
+repoDir=as.character(args[2]) # git repo directory
+sample=as.character(args[3]) # sample name
+cpus=as.numeric(args[4]) # num. of cpus
 
 ribomt = readRDS(paste0(repoDir,"/data/ribo.mito.genes.rds"))
 dir.create(paste0(wd,"/RData"),showWarnings = F)

@@ -120,6 +120,7 @@ R2="${outDir}/${sample}/processed_fastq/${sample}_filtered_and_trimmed_R2.fastq.
 
 # Aligment and quantification with STARsolo 
 # ------------------------------------------
+echo "Aln reads.."
 ionice -c 3 ${star} --soloType CB_UMI_Simple \
      --soloCBstart 1 \
      --soloCBlen 12 \
@@ -142,6 +143,16 @@ ionice -c 3 ${R1} ${R2}
 
 # Run emptyDrop with R 
 # ------------------------------
-echo "Filter out cell matrix with emptyDrop"
+echo "Filter out cell matrix with emptyDrop.."
 ${rscript_bin} --vanilla ${R_emptyDrop} "${outDir}/${sample}/aln/Solo.out/" ${wd} ${sample} ${cpus}
 
+# Zip files 
+# ------------------------------
+echo "Zip files.."
+gzip ${outDir}/${sample}/aln/Solo.out/Gene/raw/matrix.mtx
+gzip ${outDir}/${sample}/aln/Solo.out/Gene/raw/barcodes.tsv
+gzip ${outDir}/${sample}/aln/Solo.out/Gene/raw/features.tsv
+
+gzip ${outDir}/${sample}/aln/Solo.out/Gene/filtered/matrix.mtx
+gzip ${outDir}/${sample}/aln/Solo.out/Gene/filtered/barcodes.tsv
+gzip ${outDir}/${sample}/aln/Solo.out/Gene/filtered/features.tsv
