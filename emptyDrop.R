@@ -59,6 +59,7 @@ M = M[,is.cell]
 
 # Cut and Save results
 M = M[Matrix::rowSums(M)>0,]
+colnames(M) = paste(sample,colnames(M),sep = "_")
 saveRDS(M,paste0(wd,"/RData/",sample,".Filtered.mtx.rds"))
 
         
