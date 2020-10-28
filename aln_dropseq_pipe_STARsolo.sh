@@ -49,7 +49,7 @@ star='/opt/software/ngs/bin/STAR275a'
 
 # Paths to run emptyDrop
 rscript_bin='/opt/software/R/stable/3.5.1/bin/Rscript'
-R_emptyDrop='/home/users/gambardella/work/exome_variants/annovarAnnotate.R'
+R_emptyDrop="${wd}/emptyDrop.R"
 
 
 ############################
