@@ -2,7 +2,7 @@
 ## Set the working Directorty to be the current one, i.e. from where you are submitting the script
 #$ -cwd
 
-# qsub -l nodes=1:ppn=15 -l naccesspolicy=singleuser -q fourjobs -F "sample_name path/to/read1 path/to/read2 number_of_target_cells project_out_folder" /home/users/ngs/dropseq_pipe/drop_seq/aln_dropseq_pipe_STARsolo.sh
+# qsub -l nodes=1:ppn=15 -l naccesspolicy=singleuser -q fourjobs -F "sample_name path/to/read1 path/to/read2 number_of_target_cells project_out_folder" /home/users/ngs/dropseq_pipe/aln_dropseq_pipe_STARsolo.sh
 #
 # Notes:
 # sample_name = name of the sample. It will be used to store results in $project_out_folder
