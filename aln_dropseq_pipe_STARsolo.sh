@@ -133,18 +133,12 @@ ionice -c 3 ${star} --soloType CB_UMI_Simple \
      --genomeDir ${genomeAnn} \
      --readFilesIn ${R2} ${R1} \
      --readFilesCommand zcat \
-     --outFilterMultimapNmax 1 \
      --outFileNamePrefix ${outDir}/${sample}/aln/ \
      --soloCellFilter CellRanger2.2 ${ncells} 0.99 10 \
      --outSAMtype BAM Unsorted;
 
 # rm fastq
 ionice -c 3 rm ${R1} ${R2}
-
-# Sort and index bam file 
-# ------------------------------
-#samtools sort --threads ${cpus} -m 100M ${outDir}/${sample}/aln/Aligned.out.bam
-#samtools index --threads ${cpus} ${outDir}/${sample}/aln/Aligned.out.bam
 
 # Run emptyDrop with R 
 # ------------------------------
@@ -161,3 +155,10 @@ gzip ${outDir}/${sample}/aln/Solo.out/Gene/raw/features.tsv
 gzip ${outDir}/${sample}/aln/Solo.out/Gene/filtered/matrix.mtx
 gzip ${outDir}/${sample}/aln/Solo.out/Gene/filtered/barcodes.tsv
 gzip ${outDir}/${sample}/aln/Solo.out/Gene/filtered/features.tsv
+
+# Sort and index bam file 
+# ------------------------------
+samtools sort --threads ${cpus} -m 100M ${outDir}/${sample}/aln/Aligned.out.bam -o ${outDir}/${sample}/aln/Aligned.out.srt.bam
+samtools index --threads ${cpus} ${outDir}/${sample}/aln/Aligned.out.srt.bam
+rm ${outDir}/${sample}/aln/Aligned.out.bam
+
