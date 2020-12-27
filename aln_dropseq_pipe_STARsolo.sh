@@ -143,7 +143,7 @@ ionice -c 3 rm ${R1} ${R2}
 
 # Sort and index bam file 
 # ------------------------------
-samtools sort --threads ${cpus} ${outDir}/${sample}/aln/Aligned.out.bam
+samtools sort --threads ${cpus} -m 100M ${outDir}/${sample}/aln/Aligned.out.bam
 samtools index --threads ${cpus} ${outDir}/${sample}/aln/Aligned.out.bam
 
 # Run emptyDrop with R 
