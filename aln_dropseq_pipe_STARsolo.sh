@@ -138,8 +138,13 @@ ionice -c 3 ${star} --soloType CB_UMI_Simple \
      --soloCellFilter CellRanger2.2 ${ncells} 0.99 10 \
      --outSAMtype BAM Unsorted;
 
-ionice -c 3 ${R1} ${R2}
+# rm fastq
+ionice -c 3 rm ${R1} ${R2}
 
+# Sort and index bam file 
+# ------------------------------
+samtools sort --threads ${cpus} ${outDir}/${sample}/aln/Aligned.out.bam
+samtools index --threads ${cpus} ${outDir}/${sample}/aln/Aligned.out.bam
 
 # Run emptyDrop with R 
 # ------------------------------
