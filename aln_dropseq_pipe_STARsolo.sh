@@ -159,6 +159,6 @@ gzip ${outDir}/${sample}/aln/Solo.out/Gene/filtered/features.tsv
 # Sort and index bam file 
 # ------------------------------
 samtools sort --threads ${cpus} -m 100M ${outDir}/${sample}/aln/Aligned.out.bam -o ${outDir}/${sample}/aln/Aligned.out.srt.bam
-samtools index --threads ${cpus} ${outDir}/${sample}/aln/Aligned.out.srt.bam
+samtools index -@ ${cpus} ${outDir}/${sample}/aln/Aligned.out.srt.bam
 rm ${outDir}/${sample}/aln/Aligned.out.bam
 
