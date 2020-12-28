@@ -212,3 +212,15 @@ intersectFASTQ()
 		ionice -c 3 rm -r ${tmpdir}
 	fi	
 }
+
+groupBC()
+{
+	declare local r1=$1
+	declare local sampleID=$2
+	declare local outDir=$3
+
+	declare local outFile="${outDir}/${sampleID}_BC_counts.gz"
+
+	mkdir -p ${outDir}
+	ionice -c 3 zcat ${r1} | awk -F "\t" '{ printf("%s",$0); n++; if(n%4==0) { printf("\n");} else { printf("\t");} }' | awk -F "\t" '{print substr($2,1,12)}' | sort | uniq -c | sort -r -k 1 | gzip -c > ${outFile}
+}
