@@ -12,7 +12,7 @@
 ####################
 
 #export PATH=/opt/software/java/jdk8/bin/:$PATH
-wd="/home/tigem/gambardella/dropseq/" # path where the script is
+wd="/home/tigem/gambardella/dropseq_pipe/" # path where the script is
 cpus=15
 xmx=96g
 
@@ -47,11 +47,6 @@ umitool="/usr/local/bin/umi_tools"
 genomeAnn='/home/tigem/gambardella/Downloads/genome_idx/human_cellecta_myco'
 gtfAnn='/home/tigem/gambardella/Downloads/genome_idx/gencode.v36.primary_assembly.annotation.gtf'
 star="${wd}/aln_tools/STAR-2.7.5a/STAR"
-
-# Paths to run emptyDrop
-rscript_bin='/usr/bin/Rscript'
-R_emptyDrop="${wd}/emptyDrop.R"
-R_getCells="${wd}/get.valid.BC.R"
 
 # subread
 fcount="${wd}/aln_tools/subread/bin/featureCounts"

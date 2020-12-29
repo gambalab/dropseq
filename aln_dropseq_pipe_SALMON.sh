@@ -12,7 +12,7 @@
 ####################
 
 export PATH=/opt/software/java/jdk8/bin/:$PATH
-wd="/home/tigem/gambardella/dropseq/" # path where the script is
+wd="/home/tigem/gambardella/dropseq_pipe/" # path where the script is
 cpus=15
 xmx=96g
 
@@ -45,10 +45,6 @@ export LD_LIBRARY_PATH=${wd}/aln_tools/salmon_14/lib:LD_LIBRARY_PATH
 genomeAnn='/home/tigem/gambardella/Downloads/genome_idx/salmon_idx/salmon_index'
 txp2gene='/home/tigem/gambardella/Downloads/genome_idx/salmon_idx/salmon_index/txp2gene.tsv'
 salmon_aln="${wd}/aln_tools/salmon/bin/salmon"
-
-# Paths to run emptyDrop
-rscript_bin='/usr/bin/Rscript'
-R_emptyDrop="${wd}/emptyDrop.R"
 
 
 ############################
