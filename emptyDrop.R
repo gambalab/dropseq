@@ -38,6 +38,8 @@ colnames(M) = bc$barcode
 genes = read.delim(paste0(wd,"/Gene/raw/features.tsv"),stringsAsFactors = F,header = F)
 rownames(M) = substr(x = genes$V1,start = 1,stop = 15)
 
+# Remove myco pseudo-genes
+M = M[!grepl(pattern = "myco",x = rownames(M),fixed = T),]
 
 # Run emptyDrops excluding mito/ribo
 set.seed(100)
