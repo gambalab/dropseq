@@ -126,7 +126,7 @@ ionice -c 3 ${star} --soloType CB_UMI_Simple \
      --soloCBlen 12 \
      --soloUMIstart 13 \
      --soloUMIlen 8 \
-     --soloUMIdedup 1MM_Directional \
+     --soloUMIdedup 1MM_Directional_UMItools \
      --soloCBwhitelist None \
      --soloFeatures Gene Velocyto \
      --runThreadN ${cpus} \
