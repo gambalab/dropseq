@@ -129,7 +129,7 @@ ionice -c 3 ${star} --soloType CB_UMI_Simple \
      --readFilesIn ${R2} ${R1} \
      --readFilesCommand zcat \
      --outFileNamePrefix ${outDir}/${sample}/aln/ \
-     --soloCellFilter EmptyDrops_CR ${ncells} \
+     --soloCellFilter EmptyDrops_CR \
      --outSAMtype BAM Unsorted;
 
 # rm fastq
